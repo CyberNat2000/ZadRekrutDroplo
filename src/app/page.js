@@ -31,7 +31,7 @@ export default function Home() {
               { name: "Nowa pozycja", link: "#" },
             ])
           }
-          className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600"
+          className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg shadow hover:bg-violet-700"
         >
           Dodaj pozycję menu
         </button>
@@ -71,17 +71,18 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <button
                 type="button"
-                onClick={handleAddMenuItem}
-                className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition"
-              >
-                Dodaj
-              </button>
-              <button
-                type="button"
                 className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition"
               >
                 Anuluj
               </button>
+              <button
+                type="button"
+                onClick={handleAddMenuItem}
+                className="px-4 py-2 bg-white text-violet-700 border border-gray-300 rounded-lg shadow hover:bg-violet-100 transition"
+              >
+                Dodaj
+              </button>
+              
             </div>
           </form>
         </div>
