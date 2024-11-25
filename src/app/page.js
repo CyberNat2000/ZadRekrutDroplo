@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Home() {
   const [menuItems, setMenuItems] = useState([]);
@@ -24,6 +25,7 @@ export default function Home() {
         <p className="text-sm text-gray-500">
           W tym menu nie ma jeszcze żadnych linków.
         </p>
+        <div className="flex justify-center items-center">
         <button
           onClick={() =>
             setMenuItems([
@@ -31,10 +33,16 @@ export default function Home() {
               { name: "Nowa pozycja", link: "#" },
             ])
           }
-          className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg shadow hover:bg-violet-700"
+          className="flex items-center gap-2 mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg shadow hover:bg-violet-700"
         >
+          <Image
+            src="/images/dodaj.png"
+            width={20}
+            height={20}
+          />
           Dodaj pozycję menu
         </button>
+      </div>
       </div>
       <div className="space-y-6">
         {/* Formularz dodawania nowej pozycji */}
@@ -95,6 +103,11 @@ export default function Home() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
+                <Image
+                  src="/images/zoom.png"
+                  width={20}
+                  height={20}
+                />
                 <span className="px-2 py-1 text-xs font-semibold text-purple-700 bg-purple-100 rounded">
                   kolekcja
                 </span>
