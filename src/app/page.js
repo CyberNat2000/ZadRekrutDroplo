@@ -17,8 +17,25 @@ export default function Home() {
     setMenuItems(menuItems.filter((_, i) => i !== index));
   };
 
-  return (
+  return (     
     <div className="w-full max-w-3xl mx-auto p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md">
+    <div className="text-center mb-6">
+        <h2 className="text-lg font-semibold text-gray-800">Menu jest puste</h2>
+        <p className="text-sm text-gray-500">
+          W tym menu nie ma jeszcze żadnych linków.
+        </p>
+        <button
+          onClick={() =>
+            setMenuItems([
+              ...menuItems,
+              { name: "Nowa pozycja", link: "#" },
+            ])
+          }
+          className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg shadow hover:bg-purple-600"
+        >
+          Dodaj pozycję menu
+        </button>
+      </div>
       <div className="space-y-6">
         {/* Formularz dodawania nowej pozycji */}
         <div className="p-4 bg-white border border-gray-200 rounded-lg shadow">
