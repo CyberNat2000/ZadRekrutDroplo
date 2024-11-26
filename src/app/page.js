@@ -155,32 +155,41 @@ export default function Home() {
                 </form>
               ) : (
                 // Widok pozycji
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2 w-full">
                     <Image
                       src="/images/zoom.png"
                       width={20}
                       height={20}
                       alt="Ikona"
                     />
-                    <p className="text-sm font-medium text-gray-800">{item.name}</p>
-                  </div>
-                  <p className="text-sm text-gray-500">{item.link}</p>
-                  <div className="flex items-center gap-4">
+                    <div className="flex flex-col gap-px">
+                      <p className="text-sm font-medium text-gray-800">{item.name}</p>
+                      <p className="text-sm text-gray-500">{item.link}</p>
+                    </div>
+                  <div className="flex items-center justify-end ml-auto border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
                     <button
                       type="button"
                       onClick={() => setEditingItemIndex(index)}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg shadow hover:bg-gray-200 transition"
+                      className="px-4 py-2 border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
                     >
                       Edytuj
                     </button>
                     <button
                       type="button"
                       onClick={() => handleRemoveMenuItem(index)}
-                      className="px-4 py-2 bg-red-100 text-red-600 border border-red-300 rounded-lg shadow hover:bg-red-200 transition"
+                      className="px-4 py-2  border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
                     >
                       Usuń
                     </button>
+                    <button
+                      type="button"
+
+                      className="px-4 py-2 shadow hover:bg-gray-200 transition"
+                    >
+                      Dodaj pozycję menu
+                    </button>
+                    </div>
                   </div>
                 </div>
               )}
