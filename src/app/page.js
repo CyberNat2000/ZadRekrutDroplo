@@ -155,7 +155,8 @@ export default function Home() {
                 </form>
               ) : (
                 // Widok pozycji
-                <div className="flex items-center justify-between w-full">
+                <div className="flex flex-col">
+                <div className="flex items-center justify-between w-full border-b border-b-gray-200 pb-4">
                   <div className="flex items-center gap-2 w-full">
                     <Image
                       src="/images/zoom.png"
@@ -191,6 +192,16 @@ export default function Home() {
                     </button>
                     </div>
                   </div>
+                </div>
+                <div className="pt-4">
+                  <button
+                    type="button"
+
+                    className="border border-gray-300 rounded-lg bg-gray-100 text-gray-700 px-4 py-2 shadow hover:bg-gray-200 transition"
+                  >
+                    Dodaj pozycję menu
+                  </button>
+                </div>
                 </div>
               )}
             </div>
