@@ -4,22 +4,48 @@ import { useState } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  const [menuItems, setMenuItems] = useState([]);
+  const [menuItems, setMenuItems] = useState([{
+    name: "",
+    link: "",
+    isEditing: false,
+    subMenu: [],
+  },
+]);
+  const [subMenuItems, setSubMenuItems] = useState([]);
   const [editingItemIndex, setEditingItemIndex] = useState(null);
   const [isAddingMenuItem, setIsAddingMenuItem] = useState(false);
+  
+  const handleAddEmptyMenuItem = () => {
+    const newMenuItems = [...menuItems, { name: "", link: "", isEditing: true, subMenu: [] }];
+    setMenuItems(newMenuItems);
+  
+    // Otwórz formularz dla ostatnio dodanego elementu
+    setEditingItemIndex(newMenuItems.length - 1);
+  };
 
   const handleAddMenuItem = (name, link) => {
     if (!name || !link) return;
-
-    setMenuItems([...menuItems, { name, link }]);
-    setIsAddingMenuItem(false); // Ukrycie formularza po dodaniu
+  
+    const newItem = { name, link, isEditing: false, subMenu: [] };
+    setMenuItems([...menuItems, newItem]);
+    setIsAddingMenuItem(false);
   };
 
+  const handleToggleEdit = (index) => {
+    const updatedMenuItems = [...menuItems];
+    updatedMenuItems[index].isEditing = !updatedMenuItems[index].isEditing;
+    setMenuItems(updatedMenuItems);
+  };
+  
   const handleUpdateMenuItem = (index, name, link) => {
     const updatedMenuItems = [...menuItems];
-    updatedMenuItems[index] = { name, link };
+    updatedMenuItems[index] = {
+      ...updatedMenuItems[index],
+      name,
+      link,
+      isEditing: false,
+    };
     setMenuItems(updatedMenuItems);
-    setEditingItemIndex(null); // Zakończ edycję
   };
 
   const handleRemoveMenuItem = (index) => {
@@ -37,7 +63,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center items-center">
           <button
-            onClick={() => setIsAddingMenuItem(true)}
+            onClick={() => handleAddEmptyMenuItem()}
             className="flex items-center gap-2 mt-4 px-4 py-2 bg-violet-600 text-white rounded-lg shadow hover:bg-violet-700"
           >
             <Image src="/images/dodaj.png" width={20} height={20} alt="Dodaj" />
@@ -104,7 +130,7 @@ export default function Home() {
               key={index}
               className="p-4 bg-white border border-gray-200 rounded-lg shadow"
             >
-              {editingItemIndex === index ? (
+              {item.isEditing ? (
                 // Tryb edycji
                 <form
                   className="space-y-4"
@@ -140,7 +166,7 @@ export default function Home() {
                   <div className="flex items-center gap-4">
                     <button
                       type="button"
-                      onClick={() => setEditingItemIndex(null)}
+                      onClick={() => handleToggleEdit(index)}
                       className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg shadow hover:bg-gray-200 transition"
                     >
                       Anuluj
@@ -171,7 +197,7 @@ export default function Home() {
                   <div className="flex items-center justify-end ml-auto border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
                     <button
                       type="button"
-                      onClick={() => setEditingItemIndex(index)}
+                      onClick={() => handleToggleEdit(index)}
                       className="px-4 py-2 border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
                     >
                       Edytuj
@@ -185,7 +211,7 @@ export default function Home() {
                     </button>
                     <button
                       type="button"
-
+                      onClick={() => handleAddSubMenuItem(index, "Podpozycja", "#")}
                       className="px-4 py-2 shadow hover:bg-gray-200 transition"
                     >
                       Dodaj pozycję menu
@@ -196,7 +222,7 @@ export default function Home() {
                 <div className="pt-4">
                   <button
                     type="button"
-
+                    onClick={() => handleAddEmptyMenuItem()}
                     className="border border-gray-300 rounded-lg bg-gray-100 text-gray-700 px-4 py-2 shadow hover:bg-gray-200 transition"
                   >
                     Dodaj pozycję menu
