@@ -1,5 +1,11 @@
 "use client";
 
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useState } from "react";
 import Image from "next/image";
 
@@ -7,7 +13,7 @@ export default function Home() {
   const [menuItems, setMenuItems] = useState([]);
   
   const handleAddEmptyMenuItem = (priority, index) => {
-    const newMenuItem = { name: "", link: "", isEditing: true, priority: priority, isFirstTime: true };
+    const newMenuItem = { id: `item-${menuItems.length + 1}`, name: "", link: "", isEditing: true, priority: priority, isFirstTime: true };
     let newMenuItems;
 
     if (priority > 0) {
@@ -47,8 +53,123 @@ export default function Home() {
     setMenuItems(menuItems.filter((_, i) => i !== index));
   };
 
+  const SortableItem = ({ id, item, index, handleToggleEdit, handleRemoveMenuItem, handleAddEmptyMenuItem, isEditing }) => {
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+    console.log(transform, transition);
+    // Definiowanie stylów lokalnie
+    const style = {
+      transform: transform ? CSS.Transform.toString(transform) : undefined,
+      transition: transition || undefined,
+    };
+  
+    return (
+      
+      <div
+        style={style}
+        ref={setNodeRef}
+        {...attributes} 
+        className="flex flex-col"
+      >
+        <div className="flex items-center justify-between w-full border-b border-b-gray-200 pb-4">
+          <div className="flex items-center gap-2 w-full">
+            <Image
+              src="/images/zoom.png"
+              width={20}
+              height={20}
+              alt="Ikona"
+              className="cursor-grab"
+              {...listeners}
+            />
+            <div className="flex flex-col gap-px">
+              <p className="text-sm font-medium text-gray-800">{item.name}</p>
+              <p className="text-sm text-gray-500">{item.link}</p>
+            </div>
+            <div className="flex items-center justify-end ml-auto border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
+              <button
+                type="button"
+                onClick={() => handleToggleEdit(index)}
+                className="px-4 py-2 border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
+              >
+                Edytuj
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRemoveMenuItem(index)}
+                className="px-4 py-2  border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
+              >
+                Usuń
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAddEmptyMenuItem(item.priority+1, index)}
+                className="px-4 py-2 shadow hover:bg-gray-200 transition"
+              >
+                Dodaj pozycję menu
+              </button>
+              </div>
+            </div>
+          </div>
+                
+        </div>
+    );
+  };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+  
+    const oldIndex = menuItems.findIndex((item) => item.id === active.id);
+    const newIndex = menuItems.findIndex((item) => item.id === over.id);
+  
+    const draggedItem = menuItems[oldIndex];
+  
+    // Zbieranie zależnych elementów
+    const itemsToMove = [draggedItem];
+    let i = oldIndex + 1;
+  
+    while (
+      i < menuItems.length &&
+      menuItems[i].priority > draggedItem.priority
+    ) {
+      itemsToMove.push(menuItems[i]);
+      i++;
+    }
+  
+    // Usunięcie przenoszonych elementów z obecnego miejsca
+    let updatedMenuItems = menuItems.filter((item) => !itemsToMove.includes(item));
+  
+    // Wyznaczenie miejsca wstawienia
+    const insertIndex = newIndex > oldIndex
+      ? newIndex - itemsToMove.length + 1
+      : newIndex;
+  
+    // Wstawienie przenoszonych elementów w nowym miejscu
+    const reorderedItems = [
+      ...updatedMenuItems.slice(0, insertIndex),
+      ...itemsToMove,
+      ...updatedMenuItems.slice(insertIndex),
+    ];
+  
+    // Aktualizacja priorytetów w całej liście
+    const finalMenuItems = reorderedItems.map((item, index) => ({
+      ...item,
+      priority: (item.priority === 0 || index === 0) 
+        ? 0 
+        : (Math.abs(reorderedItems[index - 1].priority - item.priority) >= 2 
+          ? reorderedItems[index - 1].priority + 1 
+          : item.priority), /*priorytet zależy od tego czy podane menu jest główne (ma wartość 0) i czy różnica między
+          wyższym, a niższym jest większa lub równa 2 (to oznacza że jest przeskok), w innym wypadku zostaje takie samo*/
+    }));
+  
+    // Aktualizacja stanu
+    setMenuItems(finalMenuItems);
+  };
+  
+  
   return (
-    <div className="w-full max-w-3xl mx-auto p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md">
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <SortableContext items={menuItems.map((item) => item.id)}>
+    <div className="w-full max-w-6xl mx-auto p-6 bg-gray-50 border border-gray-200 rounded-lg shadow-md">
       {/* Sekcja początkowa */}
       {menuItems.length === 0 && (
         <div className="text-center mb-6">
@@ -74,6 +195,7 @@ export default function Home() {
         
           {menuItems.map((item, index) => (
             <div
+            style={{ marginLeft: `${item.priority * 20}px` }}
             key={index}      
             >
               {item.isEditing ? (
@@ -91,7 +213,7 @@ export default function Home() {
                 >
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Nazwa {item.priority}
+                      Nazwa
                     </label>
                     <input
                       type="text"
@@ -130,46 +252,15 @@ export default function Home() {
                 </div>
               ) : (
                 // Widok pozycji
-                <div className={`flex flex-col ml-${item.priority * 4}`}>
-                <div className="flex items-center justify-between w-full border-b border-b-gray-200 pb-4">
-                  <div className="flex items-center gap-2 w-full">
-                    <Image
-                      src="/images/zoom.png"
-                      width={20}
-                      height={20}
-                      alt="Ikona"
-                    />
-                    <div className="flex flex-col gap-px">
-                      <p className="text-sm font-medium text-gray-800">{item.name}</p>
-                      <p className="text-sm text-gray-500">{item.link}</p>
-                    </div>
-                  <div className="flex items-center justify-end ml-auto border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleEdit(index)}
-                      className="px-4 py-2 border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
-                    >
-                      Edytuj
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveMenuItem(index)}
-                      className="px-4 py-2  border-r border-r-gray-300 shadow hover:bg-gray-200 transition"
-                    >
-                      Usuń
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAddEmptyMenuItem(item.priority+1, index)}
-                      className="px-4 py-2 shadow hover:bg-gray-200 transition"
-                    >
-                      Dodaj pozycję menu
-                    </button>
-                    </div>
-                  </div>
-                </div>
-                
-                </div>
+                <SortableItem
+                  key={item.id}
+                  id={item.id}
+                  item={item}
+                  index={index}
+                  handleToggleEdit={handleToggleEdit}
+                  handleRemoveMenuItem={handleRemoveMenuItem}
+                  handleAddEmptyMenuItem={handleAddEmptyMenuItem}
+                />
               )}
             </div>
           ))}
@@ -184,8 +275,9 @@ export default function Home() {
             </div>)}
           
         </div>
-      )} {/* bardzo kreatywny sposób na obejście statyczności tailwinda VVV */}
-      {menuItems.length > 200000 && (<div className="ml-8"><div className="ml-12"><div className="ml-16"></div></div></div>)}
+      )}
     </div>
+    </SortableContext>
+    </DndContext>
   );
 }
